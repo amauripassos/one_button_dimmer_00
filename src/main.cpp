@@ -144,4 +144,3 @@ void led_test(){
             led_state=0;
         }
 }
->>>>>>> state_structure
