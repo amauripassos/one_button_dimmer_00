@@ -4,6 +4,7 @@ PwmOut led(PA_9);
 DigitalOut myleds[]={(PD_12), (PD_13), (PD_14),(PD_15)};//green, orange, red, blue
 InterruptIn bt (PA_0);
 Timer timer;
+Ticker ticker;
 
 enum led_states{RED, GREEN, YELLOW,BLUE}; //States enumeration
 int led_state = BLUE; // Defining first state as green
