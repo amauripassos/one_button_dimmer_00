@@ -14,7 +14,7 @@ enum states{DOWN, UP, FALL, MIN, RISE, MAX};
 int state = UP;
 
 float i=0.0; // PWM LED intensity
-float i_step=0.2; //PWM intensty step change
+float i_step=0.05; //PWM intensty step change
 float tbt=0.0; //time button is pressed
 
 void tbegin();
@@ -59,69 +59,50 @@ void tread(){
     t1=timer.read();
     tbt=timer.read();
     t2=timer.read();
-    if(i==0.0){//test
-        myleds[GREEN]=0;
-        myleds[RED]=1;
-    }
-    else if (i==1.0){//test
-        myleds[GREEN]=1;
-        myleds[RED]=0;
-    }
     if(t1 != t2){
-        //myleds[GREEN]=!myleds[GREEN];//test
         fsm_state_modifier();
     } 
 }
 
 void fsm_state_modifier(){
-    if((tbt<1.0)&&(bt==0)&&(state==UP)){//ok
+    if((tbt<1.0)&&(bt==0)&&(state==UP)){
         state = DOWN;
-        //do_down();
         fsm_action_trigger();
     }
-    else if((tbt<1.0)&&(bt==0)&&(state==DOWN)){//ok
+    else if((tbt<1.0)&&(bt==0)&&(state==DOWN)){
         state = UP;
-        //do_up();
         fsm_action_trigger();
     }
-    else if((tbt>=1.0)&&(state==UP)&&(i<1.0)){//ok
+    else if((tbt>=1.0)&&(state==UP)&&(i<1.0)){
         state = RISE;
-        //do_rise();
         fsm_action_trigger();
     }
     else if((tbt>=1.0)&&(state==DOWN)&&(i>0.0)){
         state = FALL;
-        //do_fall();
         fsm_action_trigger();
     }
-    else if((state==FALL)&&(bt==1)&&(i==0.0)){
+    else if((state==FALL)&&(bt==1)&&(i<=0.0)){
         state = MIN;
-        //do_min();
         fsm_action_trigger();
     }
     else if((state==RISE)&&(bt==1)&&(i==1.0)){
         state = MAX;
-        //do_max();
-        fsm_action_trigger();
+         fsm_action_trigger();
     }
     else if ((state==MAX)&&(bt==0)&&(i==1.0)){
         state = DOWN;
-        //do_down();
         fsm_action_trigger();
     }
-    else if ((state==MIN)&&(bt==0)&&(i==0.0)){
+    else if ((state==MIN)&&(bt==0)&&(i<=0.0)){
         state = UP;
-        //do_up();
         fsm_action_trigger();
     }
-        else if((bt==0)&&(state==RISE)&&(i<1.0)){
+    else if((bt==0)&&(state==RISE)&&(i<1.0)){
         state = UP;
-        //do_min();
         fsm_action_trigger();
     }
-        else if((bt==0)&&(state==FALL)&&(i>0.0)){
+    else if((bt==0)&&(state==FALL)&&(i>0.0)){
         state = DOWN;
-        //do_min();
         fsm_action_trigger();
     }
     else{
@@ -154,12 +135,14 @@ void fsm_action_trigger(){
 
 void do_up(){
     clsled();
-    myleds[BLUE]=1;
+    led_state = BLUE;
+    myleds[led_state]=1;
 }
 
 void do_down(){
     clsled();
-    myleds[ORANGE]=1;
+    led_state = ORANGE;
+    myleds[led_state]=1;
 }
 
 void do_rise(){
@@ -173,7 +156,7 @@ void do_fall(){
 }
 
 void pwm_change(){
-    if(((i_step<0.0)&&(i==0.0))||((i_step>0.0)&&(i==1.0))){
+    if(((i_step<0.0)&&(i<=0.0))||((i_step>0.0)&&(i==1.0))){
         tread();
     }
     else {
@@ -182,7 +165,6 @@ void pwm_change(){
         myleds[led_state] = 0;
         timeout.attach(&flash_led,0.2);
     }
-
 }
 
 void do_min(){
